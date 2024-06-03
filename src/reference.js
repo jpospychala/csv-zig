@@ -34,7 +34,7 @@ function test_large_csv_read() {
     const start = new Date().getTime();
     var buf = "";
     const rows = 1024;
-    const cols = 1024;
+    const cols = 1024 * 10;
 
     for (var r = 0; r < rows; r++) {
         for (var c = 0; c < cols; c++) {
