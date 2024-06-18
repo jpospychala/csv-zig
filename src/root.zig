@@ -114,32 +114,8 @@ test "read" {
     try testing.expectEqualDeep(expected, actual);
 }
 
-test "large csv read" {
+fn perfTest(rows: usize, cols: usize) !void {
     const start = std.time.milliTimestamp();
-    const rows = 1024;
-    const cols = 1024;
-    var buf = std.ArrayList(u8).init(testing.allocator);
-    defer buf.deinit();
-
-    for (0..rows) |r| {
-        for (0..cols) |c| {
-            try std.fmt.format(buf.writer(), "row{d}col{d},", .{ r, c });
-        }
-        try buf.writer().writeByte('\n');
-    }
-
-    var stream = std.io.fixedBufferStream(buf.items);
-    const now = std.time.milliTimestamp();
-    var csv = try CSV.read(stream.reader(), testing.allocator, ',');
-    const then = std.time.milliTimestamp();
-    std.debug.print("create {d} read {d} ms\n", .{ now - start, then - now });
-    defer csv.deinit(testing.allocator);
-}
-
-test "large csv readFromSlice" {
-    const start = std.time.milliTimestamp();
-    const rows = 1024;
-    const cols = 1024 * 100;
     var buf = std.ArrayList(u8).init(testing.allocator);
     defer buf.deinit();
 
@@ -155,4 +131,19 @@ test "large csv readFromSlice" {
     const then = std.time.milliTimestamp();
     std.debug.print("create {d} read {d} ms\n", .{ now - start, then - now });
     defer csv.deinitLeaky(testing.allocator);
+}
+
+test "large csv read" {
+    try perfTest(1024, 1024);
+}
+
+test "large csv readFromSlice" {
+    try perfTest(1024, 1024 * 100);
+}
+
+test "memTest" {
+    for (1..100) |i| {
+        std.debug.print("{d}\n", .{i});
+        try perfTest(1024 * i, 1024 * i);
+    }
 }

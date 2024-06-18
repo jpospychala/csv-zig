@@ -30,11 +30,9 @@ function test_read() {
     assert.deepEqual(actual, expected);
 }
 
-function test_large_csv_read() {
+function test_large_csv_read(rows, cols) {
     const start = new Date().getTime();
     var buf = "";
-    const rows = 1024;
-    const cols = 1024 * 10;
 
     for (var r = 0; r < rows; r++) {
         for (var c = 0; c < cols; c++) {
@@ -50,5 +48,12 @@ function test_large_csv_read() {
     console.log(`create ${now-start} read ${then-now} ms\n`);
 }
 
-test_read();    
-test_large_csv_read();
+test_read();
+
+test_large_csv_read(1024, 1024);
+test_large_csv_read(1024, 1024 * 100);
+
+for (var i = 1; i < 100; i++) {
+    console.log(i);
+    test_large_csv_read(1024 * i, 1024 * i);
+}
